@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+chmod ugo+x tests/test_confinement.sh
+apt-get -y build-dep lxcfs
+apt-get -y install libattr1-dev
+debian/rules build
+make tests
+./tests/main.sh

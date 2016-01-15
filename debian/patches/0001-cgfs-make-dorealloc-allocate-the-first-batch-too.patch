@@ -1,0 +1,45 @@
+From 1204f57c66a1323e61f019d5dda9684d310bfa2a Mon Sep 17 00:00:00 2001
+From: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Date: Fri, 8 Jan 2016 12:16:16 -0800
+Subject: [PATCH 1/2] cgfs: make dorealloc allocate the first batch, too
+
+With a short first line the case can be
+ *mem = NULL
+ oldlen = 0
+ newlen = 5 (anything < 50)
+making newbatches == oldbatches == 1 causing the
+ (newbatches <= oldbatches)
+condition to be true.
+
+Let realloc() handle *mem==NULL and use
+(!*mem || newbatches > oldbatches) as the only condition.
+
+Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Signed-off-by: Serge Hallyn <serge.hallyn@ubuntu.com>
+---
+ cgfs.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/cgfs.c b/cgfs.c
+index 1f31ed1..e6330e3 100644
+--- a/cgfs.c
++++ b/cgfs.c
+@@ -77,14 +77,7 @@ static void dorealloc(char **mem, size_t oldlen, size_t newlen)
+ 	int newbatches = (newlen / BATCH_SIZE) + 1;
+ 	int oldbatches = (oldlen / BATCH_SIZE) + 1;
+ 
+-	if (newbatches <= oldbatches)
+-		return;
+-
+-	if (!*mem) {
+-		do {
+-			*mem = malloc(newbatches * BATCH_SIZE);
+-		} while (!*mem);
+-	} else {
++	if (!*mem || newbatches > oldbatches) {
+ 		char *tmp;
+ 		do {
+ 			tmp = realloc(*mem, newbatches * BATCH_SIZE);
+-- 
+2.5.0
+
