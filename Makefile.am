@@ -20,12 +20,12 @@ lxcfs_SOURCES = lxcfs.c cgfs.c cgfs.h cpuset.c
 EXTRA_DIST = \
 	lxcfs.man.add
 
-if HAVE_HELP2MAN
-man_MANS = lxcfs.1
-
-lxcfs.1: lxcfs lxcfs.man.add
-	$(HELP2MAN) -n "Set up cgroup fs for containers" --no-discard-stderr -s 1 -I lxcfs.man.add -N ./lxcfs > lxcfs.1
-endif
+#if HAVE_HELP2MAN
+#man_MANS = lxcfs.1
+#
+#lxcfs.1: lxcfs lxcfs.man.add
+#	$(HELP2MAN) -n "Set up cgroup fs for containers" --no-discard-stderr -s 1 -I lxcfs.man.add -N ./lxcfs > lxcfs.1
+#endif
 
 TEST_READ: tests/test-read.c
 	$(CC) -o tests/test-read tests/test-read.c
